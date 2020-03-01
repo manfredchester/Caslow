@@ -14,13 +14,13 @@ type restiqueConf struct {
 	// CLIENT_CIDRS  string
 	// HIST_PATH string
 	// OPEN_HATEOAS  bool
+	QUERY_TIMEOUT int
+	EXEC_TIMEOUT  int
 }
 
 type DBConf struct {
 	IDLE_TIMEOUT  int
 	SESSION_LIFE  int
-	QUERY_TIMEOUT int
-	EXEC_TIMEOUT  int
 	QUERY_MAXROWS int
 	DB_TAG        string
 	PFS_HOST      string

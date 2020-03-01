@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 )
 
-func version() interface{} {
+func version(url.Values) interface{} {
 	self := filepath.Base(os.Args[0])
 	branch, hash, reversions := getGitInfo()
 	return map[string]string{

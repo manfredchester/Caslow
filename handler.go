@@ -61,11 +61,11 @@ func handler(proc func(url.Values) interface{}) http.HandlerFunc {
 		args = r.Form
 		args.Add("REQUEST_URL_PATH", r.URL.Path)
 		data := proc(args)
+		fmt.Println("=====hander=====")
 		if e, ok := data.(httpError); ok {
 			panic(httpError{
 				Code: http.StatusFound,
-				Mesg: fmt.Sprintf("/uilgn?name=%s&err=%s", args.Get("name"),
-					e.Mesg),
+				Mesg: fmt.Sprintf("/uilgn?name=%s&err=%s", args.Get("name"), e.Mesg),
 			})
 		}
 		mw := io.MultiWriter(&out, w)

@@ -26,7 +26,7 @@ func main() {
 	if *ver {
 		enc := json.NewEncoder(os.Stdout)
 		enc.SetIndent("", "	")
-		enc.Encode(version())
+		enc.Encode(version(nil))
 		return
 	}
 
@@ -35,8 +35,14 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", handler(home))
+	mux.HandleFunc("/help", handler(help))
+	mux.HandleFunc("/version", handler(version))
 
-	timeout := 60
+	timeout := rc.QUERY_TIMEOUT
+	if rc.EXEC_TIMEOUT > timeout {
+		timeout = rc.EXEC_TIMEOUT
+	}
+	timeout += 60
 	svr := http.Server{
 		Addr:         ":" + rc.SERVICE_PORT,
 		Handler:      mux,
