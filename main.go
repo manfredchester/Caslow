@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"os/signal"
 	"strconv"
+	"syscall"
 	"time"
 )
 
@@ -32,11 +34,15 @@ func main() {
 
 	parseConfig(*conf)
 	savePid()
-
+	LoadDSNs()
+	handleSignals()
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", handler(home))
+	mux.HandleFunc("/errpage", handler(errpage))
 	mux.HandleFunc("/help", handler(help))
 	mux.HandleFunc("/version", handler(version))
+	mux.HandleFunc("/conns", handler(conns))
+	mux.HandleFunc("/query", handler(query))
 
 	timeout := rc.QUERY_TIMEOUT
 	if rc.EXEC_TIMEOUT > timeout {
@@ -58,4 +64,17 @@ func savePid() {
 	defer f.Close()
 	_, err = f.Write([]byte(strconv.Itoa(os.Getpid())))
 	assert(err)
+}
+
+func handleSignals() {
+	sigch := make(chan os.Signal, 1)
+	signal.Notify(sigch, syscall.SIGHUP)
+	go func() {
+		for {
+			switch <-sigch {
+			case syscall.SIGHUP:
+				LoadDSNs()
+			}
+		}
+	}()
 }

@@ -19,8 +19,9 @@ type endPoint struct {
 }
 
 func help(args url.Values) interface{} {
-	fmt.Println("help")
-
+	fmt.Println("help handle")
+	path := args.Get("REQUEST_URL_PATH")
+	fmt.Println("args.Get(REQUEST_URL_PATH)", path)
 	return []endPoint{
 		endPoint{
 			EndPoint: "",
@@ -43,5 +44,11 @@ func help(args url.Values) interface{} {
 				},
 			},
 		},
+	}
+}
+
+func errpage(args url.Values) interface{} {
+	return map[string]string{
+		"ErrorInfo": args.Get("err"),
 	}
 }

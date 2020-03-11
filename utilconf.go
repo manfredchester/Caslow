@@ -35,7 +35,7 @@ func parseConfig(fn string) {
 	// rc.IDLE_TIMEOUT = 300
 	// rc.SESSION_LIFE = 3600
 	// rc.DB_TAG = "[DB]"
-	rc.PID_FILE = "./restique.pid"
+	rc.PID_FILE = "./caslow.pid"
 	rc.LOG_PATH = "./logs"
 	// rc.HIST_PATH = "./history"
 	// rc.PFS_HOST = "pfs.paadoo.net"

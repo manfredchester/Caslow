@@ -34,6 +34,7 @@ func handler(proc func(url.Values) interface{}) http.HandlerFunc {
 					code = http.StatusInternalServerError
 					data = e.(error).Error()
 				}
+				fmt.Println("code:", code)
 				if code >= 300 && code < 400 {
 					http.Redirect(w, r, data, code)
 				} else {
@@ -61,16 +62,17 @@ func handler(proc func(url.Values) interface{}) http.HandlerFunc {
 		args = r.Form
 		args.Add("REQUEST_URL_PATH", r.URL.Path)
 		data := proc(args)
-		fmt.Println("=====hander=====")
+		fmt.Println("=====hander done=====")
 		if e, ok := data.(httpError); ok {
 			panic(httpError{
 				Code: http.StatusFound,
-				Mesg: fmt.Sprintf("/uilgn?name=%s&err=%s", args.Get("name"), e.Mesg),
+				Mesg: fmt.Sprintf("/errpage?&err=%s", e.Mesg),
 			})
 		}
 		mw := io.MultiWriter(&out, w)
 		enc := json.NewEncoder(mw)
 		enc.SetIndent("", "    ")
 		assert(enc.Encode(data))
+		fmt.Println("=====response done=====")
 	}
 }
