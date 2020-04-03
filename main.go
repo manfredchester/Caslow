@@ -15,7 +15,7 @@ import (
 func main() {
 	defer func() {
 		if e := recover(); e != nil {
-			msg := trace("ERROR: %v", e)
+			msg := trace("Main ERROR: %v", e)
 			for _, m := range msg {
 				fmt.Println(m)
 			}

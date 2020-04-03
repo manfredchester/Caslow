@@ -66,7 +66,7 @@ func handler(proc func(url.Values) interface{}) http.HandlerFunc {
 		if e, ok := data.(httpError); ok {
 			panic(httpError{
 				Code: http.StatusFound,
-				Mesg: fmt.Sprintf("/errpage?&err=%s", e.Mesg),
+				Mesg: fmt.Sprintf("/errpage?err=%s", e.Mesg),
 			})
 		}
 		mw := io.MultiWriter(&out, w)

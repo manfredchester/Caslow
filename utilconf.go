@@ -16,15 +16,17 @@ type restiqueConf struct {
 	// OPEN_HATEOAS  bool
 	QUERY_TIMEOUT int
 	EXEC_TIMEOUT  int
+	DB_TAG        string
+	QUERY_MAXROWS int
 }
 
 type DBConf struct {
-	IDLE_TIMEOUT  int
-	SESSION_LIFE  int
-	QUERY_MAXROWS int
-	DB_TAG        string
-	PFS_HOST      string
-	PFS_PORT      string
+	IDLE_TIMEOUT int
+	SESSION_LIFE int
+	// QUERY_MAXROWS int
+	// DB_TAG        string
+	PFS_HOST string
+	PFS_PORT string
 }
 
 var rc restiqueConf
@@ -34,7 +36,7 @@ func parseConfig(fn string) {
 	rc.SERVICE_PORT = "32779"
 	// rc.IDLE_TIMEOUT = 300
 	// rc.SESSION_LIFE = 3600
-	// rc.DB_TAG = "[DB]"
+	rc.DB_TAG = "[DB]"
 	rc.PID_FILE = "./caslow.pid"
 	rc.LOG_PATH = "./logs"
 	// rc.HIST_PATH = "./history"
@@ -49,9 +51,9 @@ func parseConfig(fn string) {
 	// if rc.SESSION_LIFE > 864000 {
 	// 	rc.SESSION_LIFE = 864000
 	// }
-	// if rc.QUERY_TIMEOUT <= 0 {
-	// 	rc.QUERY_TIMEOUT = 60
-	// }
+	if rc.QUERY_TIMEOUT <= 0 {
+		rc.QUERY_TIMEOUT = 60
+	}
 	// if rc.EXEC_TIMEOUT <= 0 {
 	// 	rc.EXEC_TIMEOUT = 60
 	// }

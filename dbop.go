@@ -1,9 +1,12 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"sync"
 	"time"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 type dsInfo struct {
@@ -55,4 +58,17 @@ func MySqlDsn(di DbInfo) string {
 	dsn_tpl := "%s:%s@tcp(%s:%s)/%s"
 	return fmt.Sprintf(dsn_tpl, di.DbUser, di.DbPass, di.DbHost,
 		di.DbPort, di.DbName)
+}
+
+func RangeRows(rows *sql.Rows, proc func()) {
+	defer func() {
+		if e := recover(); e != nil {
+			rows.Close()
+			panic(e)
+		}
+	}()
+	for rows.Next() {
+		proc()
+	}
+	assert(rows.Err())
 }
