@@ -19,7 +19,7 @@ type (
 	// }
 )
 
-func query(args url.Values,reqBody map[string]interface{}) (res interface{}) {
+func query(args url.Values, reqBody map[string]interface{}) (res interface{}) {
 	use := args.Get("use")
 	dl.RLock()
 	ds, ok := dsns[use]
@@ -45,10 +45,11 @@ func query(args url.Values,reqBody map[string]interface{}) (res interface{}) {
 			}
 		}
 	}()
+	// 多库查询
 	for _, ds := range dss {
 		conn, err := getDB(ds.Driver, ds.Dsn, "query")
 		assert(err)
-		data, tq, tf := doqry(conn, args)
+		data, tq, tf := doqry(conn, args, reqBody)
 		tqs = tqs + tq
 		tfs = tfs + tf
 		for _, d := range data {
@@ -59,7 +60,6 @@ func query(args url.Values,reqBody map[string]interface{}) (res interface{}) {
 		}
 		summary := fmt.Sprintf("Got %d row(s) in %fs (query=%fs; fetch=%fs)",
 			len(recs), tqs+tfs, tqs, tfs)
-		fmt.Println("summary:", summary)
 		recs = append(recs, map[string]interface{}{
 			"summary": summary,
 		})
@@ -68,14 +68,15 @@ func query(args url.Values,reqBody map[string]interface{}) (res interface{}) {
 	return recs
 }
 
-func doqry(conn *sql.DB, args url.Values) (queryResults, float64, float64) {
+func doqry(conn *sql.DB, args url.Values, reqBody map[string]interface{}) (queryResults, float64, float64) {
 	var tq, tf float64
-	qry := args.Get("sql")
+	// qry := args.Get("sql")
+	qry := reqBody["sql"]
 	timeout := time.Duration(rc.QUERY_TIMEOUT) * time.Second
 	ctx, cf := context.WithTimeout(context.Background(), timeout)
 	defer cf()
 	start := time.Now()
-	rows, err := conn.QueryContext(ctx, qry)
+	rows, err := conn.QueryContext(ctx, qry.(string))
 	assert(err)
 	tq = time.Since(start).Seconds()
 	start = time.Now()

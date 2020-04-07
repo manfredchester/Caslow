@@ -44,6 +44,7 @@ func main() {
 	mux.HandleFunc("/version", handler(version))
 	mux.HandleFunc("/conns", handler(conns))
 	mux.HandleFunc("/query", handler(query))
+	mux.HandleFunc("/exec", handler(execute))
 
 	timeout := rc.QUERY_TIMEOUT
 	if rc.EXEC_TIMEOUT > timeout {

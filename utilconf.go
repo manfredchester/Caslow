@@ -54,9 +54,9 @@ func parseConfig(fn string) {
 	if rc.QUERY_TIMEOUT <= 0 {
 		rc.QUERY_TIMEOUT = 60
 	}
-	// if rc.EXEC_TIMEOUT <= 0 {
-	// 	rc.EXEC_TIMEOUT = 60
-	// }
+	if rc.EXEC_TIMEOUT <= 0 {
+		rc.EXEC_TIMEOUT = 60
+	}
 	// rc.CLIENT_CIDRS = strings.TrimSpace(rc.CLIENT_CIDRS)
 	// if len(rc.CLIENT_CIDRS) > 0 {
 	// 	allowed_cidrs = strings.Split(rc.CLIENT_CIDRS, ",")

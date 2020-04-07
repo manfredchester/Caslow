@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"test/zhlog"
 	"time"
 )
 
@@ -26,6 +27,7 @@ func handler(proc func(url.Values, map[string]interface{}) interface{}) http.Han
 			code := http.StatusOK
 			data := out.String()
 			if e := recover(); e != nil {
+				zhlog.Error("traceID string", "%+v", e)
 				switch e.(type) {
 				case httpError:
 					code = e.(httpError).Code
@@ -36,6 +38,9 @@ func handler(proc func(url.Values, map[string]interface{}) interface{}) http.Han
 				}
 				fmt.Println("code:", code)
 				if code >= 300 && code < 400 {
+					// stringReader := strings.NewReader("test!")
+					// r.Body = ioutil.NopCloser(stringReader)
+					// fmt.Println("sadsr.Body:", r.Body)
 					http.Redirect(w, r, data, code)
 				} else {
 					http.Error(w, data, code)
@@ -62,13 +67,25 @@ func handler(proc func(url.Values, map[string]interface{}) interface{}) http.Han
 		r.ParseForm()
 		fmt.Println("HTTP Method:", r.Method)
 		fmt.Println("HTTP Header:", r.Header)
+		fmt.Println("r.URL.Path:", r.URL.Path)
+
 		args = r.Form
 		// fmt.Println("args:", args)
 		// fmt.Println("get req:", r.FormValue("post1"), r.Form["post1"], r.PostFormValue("post1"))
 
+		// fmt.Println("r.Body:", string(r.Body))
+		// buf11 := new(bytes.Buffer)
+		// buf11.ReadFrom(r.Body)
+		// fmt.Println(buf11.String())
+
+		// defer r.Body.Close()
 		reqBody := make(map[string]interface{})
-		assert(json.NewDecoder(r.Body).Decode(&reqBody))
-		fmt.Println("request Body:", reqBody)
+		// if buf11.String() != "" {
+		// assert(json.NewDecoder(r.Body).Decode(&reqBody))
+		// }
+		// 业务层增加map key的判断
+		json.NewDecoder(r.Body).Decode(&reqBody)
+		fmt.Println("HTTP Body:", reqBody)
 
 		args.Add("REQUEST_URL_PATH", r.URL.Path)
 		data := proc(args, reqBody)
