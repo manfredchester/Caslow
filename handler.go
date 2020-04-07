@@ -16,7 +16,7 @@ type httpError struct {
 	Mesg string
 }
 
-func handler(proc func(url.Values) interface{}) http.HandlerFunc {
+func handler(proc func(url.Values, map[string]interface{}) interface{}) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var args url.Values
 		var out bytes.Buffer
@@ -58,10 +58,20 @@ func handler(proc func(url.Values) interface{}) http.HandlerFunc {
 			}
 		}()
 		// TODO Validate
+
 		r.ParseForm()
+		fmt.Println("HTTP Method:", r.Method)
+		fmt.Println("HTTP Header:", r.Header)
 		args = r.Form
+		// fmt.Println("args:", args)
+		// fmt.Println("get req:", r.FormValue("post1"), r.Form["post1"], r.PostFormValue("post1"))
+
+		reqBody := make(map[string]interface{})
+		assert(json.NewDecoder(r.Body).Decode(&reqBody))
+		fmt.Println("request Body:", reqBody)
+
 		args.Add("REQUEST_URL_PATH", r.URL.Path)
-		data := proc(args)
+		data := proc(args, reqBody)
 		fmt.Println("=====hander done=====")
 		if e, ok := data.(httpError); ok {
 			panic(httpError{

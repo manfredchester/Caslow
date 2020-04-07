@@ -28,11 +28,12 @@ func main() {
 	if *ver {
 		enc := json.NewEncoder(os.Stdout)
 		enc.SetIndent("", "	")
-		enc.Encode(version(nil))
+		enc.Encode(version(nil, nil))
 		return
 	}
 
 	parseConfig(*conf)
+	printers()
 	savePid()
 	LoadDSNs()
 	handleSignals()
@@ -56,6 +57,12 @@ func main() {
 		WriteTimeout: time.Duration(timeout) * time.Second,
 	}
 	assert(svr.ListenAndServe())
+}
+
+func printers() {
+	fmt.Println(LOGO)
+	_, hash, reversions := getGitInfo()
+	fmt.Println("Version: ", fmt.Sprintf("V%d.%s", reversions, hash))
 }
 
 func savePid() {

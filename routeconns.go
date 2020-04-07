@@ -13,7 +13,7 @@ func init() {
 	connsCache = make(map[string]*sql.DB)
 }
 
-func conns(url.Values) interface{} {
+func conns(url.Values, map[string]interface{}) interface{} {
 	dl.RLock()
 	defer dl.RUnlock()
 	var cs []map[string]string

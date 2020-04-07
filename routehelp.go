@@ -18,7 +18,7 @@ type endPoint struct {
 	Returns  []epArg
 }
 
-func help(args url.Values) interface{} {
+func help(args url.Values, reqBody map[string]interface{}) interface{} {
 	fmt.Println("help handle")
 	path := args.Get("REQUEST_URL_PATH")
 	fmt.Println("args.Get(REQUEST_URL_PATH)", path)
@@ -47,7 +47,7 @@ func help(args url.Values) interface{} {
 	}
 }
 
-func errpage(args url.Values) interface{} {
+func errpage(args url.Values, reqBody map[string]interface{}) interface{} {
 	return map[string]string{
 		"ErrorInfo": args.Get("err"),
 	}

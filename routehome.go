@@ -6,7 +6,7 @@ import (
 	"net/url"
 )
 
-func home(args url.Values) interface{} {
+func home(args url.Values, reqBody map[string]interface{}) interface{} {
 	fmt.Println("home handle")
 	path := args.Get("REQUEST_URL_PATH")
 	fmt.Println("args.Get(REQUEST_URL_PATH)", path)

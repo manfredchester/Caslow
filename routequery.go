@@ -19,7 +19,7 @@ type (
 	// }
 )
 
-func query(args url.Values) (res interface{}) {
+func query(args url.Values,reqBody map[string]interface{}) (res interface{}) {
 	use := args.Get("use")
 	dl.RLock()
 	ds, ok := dsns[use]
