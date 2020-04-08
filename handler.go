@@ -27,7 +27,7 @@ func handler(proc func(url.Values, map[string]interface{}) interface{}) http.Han
 			code := http.StatusOK
 			data := out.String()
 			if e := recover(); e != nil {
-				zhlog.Error("traceID string", "%+v", e)
+				zhlog.Error("handler defer", "%+v", e)
 				switch e.(type) {
 				case httpError:
 					code = e.(httpError).Code
@@ -84,7 +84,10 @@ func handler(proc func(url.Values, map[string]interface{}) interface{}) http.Han
 		// assert(json.NewDecoder(r.Body).Decode(&reqBody))
 		// }
 		// 业务层增加map key的判断
-		json.NewDecoder(r.Body).Decode(&reqBody)
+		err := json.NewDecoder(r.Body).Decode(&reqBody)
+		if err != nil {
+			zhlog.Error("handler json.NewDecoder", "%s", err.Error())
+		}
 		fmt.Println("HTTP Body:", reqBody)
 
 		args.Add("REQUEST_URL_PATH", r.URL.Path)

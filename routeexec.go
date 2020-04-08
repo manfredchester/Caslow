@@ -12,7 +12,10 @@ import (
 
 func doexe(conn *sql.DB, args url.Values, reqBody map[string]interface{}) (queryResults, float64) {
 	// qry := args.Get("sql")
-	qry := reqBody["sql"]
+	qry, ok := reqBody["sql"]
+	if !ok {
+		return queryResults{}, -1
+	}
 	ctx, cf := context.WithTimeout(context.Background(), time.Duration(rc.EXEC_TIMEOUT)*time.Second)
 	defer cf()
 	start := time.Now()
@@ -66,7 +69,7 @@ func execute(args url.Values, reqBody map[string]interface{}) (res interface{}) 
 	dss = append(dss, ds)
 	defer func() {
 		if e := recover(); e != nil {
-			zhlog.Error("traceID string", "%s", e.(error).Error())
+			zhlog.Error("execute sql", "%s", e.(error).Error())
 			res = httpError{
 				Code: http.StatusInternalServerError,
 				Mesg: e.(error).Error(),
@@ -77,6 +80,9 @@ func execute(args url.Values, reqBody map[string]interface{}) (res interface{}) 
 		conn, err := getDB(ds.Driver, ds.Dsn, "exec")
 		assert(err)
 		data, elapsed := doexe(conn, args, reqBody)
+		if elapsed == -1 {
+			assert(fmt.Errorf("request body lose SQL"))
+		}
 		els += elapsed
 		for _, d := range data {
 			if len(dss) > 1 {

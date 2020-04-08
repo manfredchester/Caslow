@@ -15,6 +15,7 @@ type endPoint struct {
 	Purpose  string
 	Note     string
 	Args     []epArg
+	Body     []epArg
 	Returns  []epArg
 }
 
@@ -81,7 +82,7 @@ func help(args url.Values, reqBody map[string]interface{}) interface{} {
 		},
 		endPoint{
 			EndPoint: "/query",
-			Purpose:  "",
+			Purpose:  "query data",
 			Note:     "",
 			Args: []epArg{
 				epArg{
@@ -89,10 +90,51 @@ func help(args url.Values, reqBody map[string]interface{}) interface{} {
 					Hint: "choose db name",
 				},
 			},
+			Body: []epArg{
+				epArg{
+					Name: "sql",
+					Hint: "query SQL",
+				},
+			},
 			Returns: []epArg{
 				epArg{
-					Name: "",
-					Hint: "",
+					Name: "columns",
+					Hint: "columns values",
+				},
+				epArg{
+					Name: "summary",
+					Hint: "Got len(result) row(s) in tqs+tfs (query= tqs; fetch= tfs)",
+				},
+			},
+		},
+		endPoint{
+			EndPoint: "/exec",
+			Purpose:  "exec data",
+			Note:     "",
+			Args: []epArg{
+				epArg{
+					Name: "use",
+					Hint: "choose db name",
+				},
+			},
+			Body: []epArg{
+				epArg{
+					Name: "sql",
+					Hint: "execute SQL",
+				},
+			},
+			Returns: []epArg{
+				epArg{
+					Name: "last_insert_id",
+					Hint: "last insert id",
+				},
+				epArg{
+					Name: "rows_affected",
+					Hint: "rows affected",
+				},
+				epArg{
+					Name: "summary",
+					Hint: "Executed statement in elapsed",
 				},
 			},
 		},

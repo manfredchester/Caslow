@@ -19,59 +19,14 @@ type (
 	// }
 )
 
-func query(args url.Values, reqBody map[string]interface{}) (res interface{}) {
-	use := args.Get("use")
-	dl.RLock()
-	ds, ok := dsns[use]
-	dl.RUnlock()
-	if !ok {
-		return httpError{
-			Code: http.StatusSeeOther,
-			Mesg: "[use] is not a valid data source",
-		}
-	}
-	var (
-		dss      []dsInfo
-		recs     queryResults
-		tqs, tfs float64
-	)
-	dss = append(dss, ds)
-	defer func() {
-		if e := recover(); e != nil {
-			zhlog.Error("traceID string", "%s", e.(error).Error())
-			res = httpError{
-				Code: http.StatusInternalServerError,
-				Mesg: e.(error).Error(),
-			}
-		}
-	}()
-	// 多库查询
-	for _, ds := range dss {
-		conn, err := getDB(ds.Driver, ds.Dsn, "query")
-		assert(err)
-		data, tq, tf := doqry(conn, args, reqBody)
-		tqs = tqs + tq
-		tfs = tfs + tf
-		for _, d := range data {
-			if len(dss) > 1 {
-				d[rc.DB_TAG] = ds.Name
-			}
-			recs = append(recs, d)
-		}
-		summary := fmt.Sprintf("Got %d row(s) in %fs (query=%fs; fetch=%fs)",
-			len(recs), tqs+tfs, tqs, tfs)
-		recs = append(recs, map[string]interface{}{
-			"summary": summary,
-		})
-		// args.Set("RESTIQUE_SUMMARY", summary)
-	}
-	return recs
-}
-
 func doqry(conn *sql.DB, args url.Values, reqBody map[string]interface{}) (queryResults, float64, float64) {
 	var tq, tf float64
 	// qry := args.Get("sql")
-	qry := reqBody["sql"]
+	// qry := reqBody["sql"]
+	qry, ok := reqBody["sql"]
+	if !ok {
+		return queryResults{}, -1, -1
+	}
 	timeout := time.Duration(rc.QUERY_TIMEOUT) * time.Second
 	ctx, cf := context.WithTimeout(context.Background(), timeout)
 	defer cf()
@@ -106,4 +61,56 @@ func doqry(conn *sql.DB, args url.Values, reqBody map[string]interface{}) (query
 	})
 	tf = time.Since(start).Seconds()
 	return recs, tq, tf
+}
+
+func query(args url.Values, reqBody map[string]interface{}) (res interface{}) {
+	use := args.Get("use")
+	dl.RLock()
+	ds, ok := dsns[use]
+	dl.RUnlock()
+	if !ok {
+		return httpError{
+			Code: http.StatusSeeOther,
+			Mesg: "[use] is not a valid data source",
+		}
+	}
+	var (
+		dss      []dsInfo
+		recs     queryResults
+		tqs, tfs float64
+	)
+	dss = append(dss, ds)
+	defer func() {
+		if e := recover(); e != nil {
+			zhlog.Error("query sql", "%s", e.(error).Error())
+			res = httpError{
+				Code: http.StatusInternalServerError,
+				Mesg: e.(error).Error(),
+			}
+		}
+	}()
+	// 多库查询
+	for _, ds := range dss {
+		conn, err := getDB(ds.Driver, ds.Dsn, "query")
+		assert(err)
+		data, tq, tf := doqry(conn, args, reqBody)
+		if tq == -1 || tf == -1 {
+			assert(fmt.Errorf("request body lose SQL"))
+		}
+		tqs = tqs + tq
+		tfs = tfs + tf
+		for _, d := range data {
+			if len(dss) > 1 {
+				d[rc.DB_TAG] = ds.Name
+			}
+			recs = append(recs, d)
+		}
+		summary := fmt.Sprintf("Got %d row(s) in %fs (query=%fs; fetch=%fs)",
+			len(recs), tqs+tfs, tqs, tfs)
+		recs = append(recs, map[string]interface{}{
+			"summary": summary,
+		})
+		// args.Set("RESTIQUE_SUMMARY", summary)
+	}
+	return recs
 }
