@@ -1,8 +1,9 @@
 package main
 
 import (
-	"go-conf"
 	"os"
+
+	conf "github.com/manfredchester/go-conf"
 )
 
 type restiqueConf struct {

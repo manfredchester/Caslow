@@ -4,7 +4,6 @@
 *.dll
 *.so
 *.dylib
-
 # Test binary, built with `go test -c`
 *.test
 
@@ -12,6 +11,7 @@
 *.out
 *.log
 *.pid
-
+logs/
 # Dependency directories (remove the comment below to include it)
 # vendor/
+go.sum

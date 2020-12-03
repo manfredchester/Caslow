@@ -24,14 +24,13 @@ func main() {
 	conf := flag.String("conf", "", "configuration file")
 	ver := flag.Bool("version", false, "show version info")
 	flag.Parse()
-
+	
 	if *ver {
 		enc := json.NewEncoder(os.Stdout)
 		enc.SetIndent("", "	")
 		enc.Encode(version(nil, nil))
 		return
 	}
-
 	parseConfig(*conf)
 	printers()
 	savePid()

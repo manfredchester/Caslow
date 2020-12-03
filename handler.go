@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"test/zhlog"
 	"time"
 )
 
@@ -27,7 +26,7 @@ func handler(proc func(url.Values, map[string]interface{}) interface{}) http.Han
 			code := http.StatusOK
 			data := out.String()
 			if e := recover(); e != nil {
-				zhlog.Error("handler defer", "%+v", e)
+				fmt.Errorf("handler defer", "%+v", e)
 				switch e.(type) {
 				case httpError:
 					code = e.(httpError).Code
@@ -86,7 +85,7 @@ func handler(proc func(url.Values, map[string]interface{}) interface{}) http.Han
 		// 业务层增加map key的判断
 		err := json.NewDecoder(r.Body).Decode(&reqBody)
 		if err != nil {
-			zhlog.Error("handler json.NewDecoder", "%s", err.Error())
+			fmt.Errorf("handler json.NewDecoder", "%s", err.Error())
 		}
 		fmt.Println("HTTP Body:", reqBody)
 

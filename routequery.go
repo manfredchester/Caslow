@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"test/zhlog"
 	"time"
 )
 
@@ -82,7 +81,7 @@ func query(args url.Values, reqBody map[string]interface{}) (res interface{}) {
 	dss = append(dss, ds)
 	defer func() {
 		if e := recover(); e != nil {
-			zhlog.Error("query sql", "%s", e.(error).Error())
+			fmt.Errorf("query sql", "%s", e.(error).Error())
 			res = httpError{
 				Code: http.StatusInternalServerError,
 				Mesg: e.(error).Error(),
